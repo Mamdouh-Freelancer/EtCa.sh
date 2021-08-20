@@ -1,5 +1,7 @@
 # EtCa.sh
-EtCa.sh is an Etisalat Cash wrapper example for Linux, written in bash script.
+EtCa.sh is an Etisalat Cash wrapper example for Linux, written in bash script & uses `curl`.
+
+## Don't use it as payment gateway for your customers (as example) coz it didn't made for this purpose.
 
 ![carbon](https://user-images.githubusercontent.com/23267401/130256267-558c361f-2460-4b7c-8314-61f7c993b7fa.png)
 
@@ -26,8 +28,13 @@ EtCa.sh is an Etisalat Cash wrapper example for Linux, written in bash script.
 
 ### How to 
 
-first set read/write/execute permissions to script
+Download zip file manually or clone using git:
+
+`git clone https://github.com/Mamdouh-Freelancer/EtCa.sh.git`
+
+Set read/write/execute permissions to script
 `chmod 777 ./EtCa.sh`
+ 
 
 ### [OPTIONS]
 
@@ -75,7 +82,9 @@ session logout and clean up local session & cookies files.
 to prettify XML output use any XML parser like `tidy`:
 `./EtCa.sh --wallet 01123456789 --transactions --pin 654321 | tidy -xml -i -q`
 
-
+#Notes
+ 1) Some `curl` headers are encoded, to decode it use `base64` & `base32` and just `echo`.
+ 2) This repository is useful for automation tasks for your own wallet and as mentioned before don't use it as payment gateway for your customers (as example) coz it doesn't made for this purpose.
 
 
 
