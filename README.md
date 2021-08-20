@@ -1,9 +1,10 @@
 # EtCa.sh
 EtCa.sh is an Etisalat Cash wrapper example for Linux, written in bash script & uses `curl`.
 
-## Don't use it as payment gateway for your customers (as example) coz it didn't made for this purpose.
-
 ![carbon](https://user-images.githubusercontent.com/23267401/130256267-558c361f-2460-4b7c-8314-61f7c993b7fa.png)
+
+## Don't use it as payment gateway for your customers (as example) coz it isn't made for that purpose.
+
 
                #**********#
                # Consider #
