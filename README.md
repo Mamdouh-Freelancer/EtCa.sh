@@ -13,51 +13,52 @@ EtCa.sh is an Etisalat Cash wrapper example for Linux, written in bash script.
                 * 3. contact author by mail mamdouh.saeed.eg@gmail.com                    *
                 ***************************************************************************
 
-**Supported Features:**
-* Send money to any wallet in Egypt.
-* Check wallet balance.
-* Create virtual credit card VCC.
-* List transactions history
+### Supported Features:
+- [x] Send money to any wallet in Egypt.
+- [x] Check wallet balance.
+- [x] Create virtual credit card VCC.
+- [x] List transactions history
 
 
-**Known Issues**
+### Known Issues
 * Most important server responses are handled well but not all.
 * `updateCookies` function needs some improvements to check cookies expiration and reupdate it.
 
-**How to**
+### How to 
+
 first set read/write/execute permissions to script
 `chmod 777 ./EtCa.sh`
 
-**[OPTIONS]**
+### [OPTIONS]
 
-`--wallet`         
+#### `--wallet`         
 wallet number in local format e.g. 01123456789.
 
-`--auth`           
+#### `--auth`           
 to authenticate for first time login or if cookies expired (consider `updateCookies` function). this is a must to request and verify OTP.
 
-`--otp`            
+#### `--otp`            
 One-Time-Password included in SMS that you recieved for verification.
 
-`--pin`            
+#### `--pin`            
 wallet pin code should be 6 digits. contact service provider for more info. pin code is a must to take any actions/inquiries.
 
-`--balance`        
+#### `--balance`        
 check wallet balance, `--pin` code needed.
 
-`--vcc`            
+#### `--vcc`            
 create VCC virtual credit card. card details will be sent in SMS. `--pin`, `--amount` are needed.
 
-`--amount`         
+#### `--amount`         
 specify amount when using `--sendto` and `--vcc`.
 
-`--transactions`   
-list transactions history in XML format.
+#### `--transactions`   
+list transactions history in XML format. `--pin` code needed.
 
-`--signout` or `--logout`
+#### `--signout` or `--logout`
 session logout and clean up local session & cookies files.
 
-**Examples**
+## Examples
 
 1) Authentication:
 `./EtCa.sh --wallet 01123456789 --auth`
@@ -71,8 +72,7 @@ session logout and clean up local session & cookies files.
 `./EtCa.sh --wallet 01123456789 --vcc --amount 500 --pin 654321`
 6) List transactions history:
 `./EtCa.sh --wallet 01123456789 --transactions --pin 654321`
-
-to prettify XML output pipe it to any XML parser like tidy as shown below:
+to prettify XML output use any XML parser like `tidy`:
 `./EtCa.sh --wallet 01123456789 --transactions --pin 654321 | tidy -xml -i -q`
 
 
