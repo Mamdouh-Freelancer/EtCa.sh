@@ -42,6 +42,9 @@ Set read/write/execute permissions to script
 #### `--wallet`         
 wallet number in local format e.g. 01123456789.
 
+### `--sendto`
+destination wallet number that will receive money from you, formated as 01123456789.
+
 #### `--auth`           
 to authenticate for first time login or if cookies expired (consider `updateCookies` function). this is a must to request and verify OTP.
 
