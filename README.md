@@ -21,6 +21,9 @@ EtCa.sh is an Etisalat Cash wrapper example for Linux, written in bash script & 
 - [x] Check wallet balance.
 - [x] Create virtual credit card VCC.
 - [x] List transactions history
+- [x] Donate.
+- [x] Pay to merchant.
+- [x] Reset pin code.  
 
 
 ### Known Issues
@@ -66,25 +69,111 @@ specify amount when using `--sendto` and `--vcc`.
 #### `--transactions`   
 list transactions history in XML format. `--pin` code needed.
 
+#### `--donation`
+list all available foundations with their ID's from donations.txt, attach `--org`, `--amount` and `--pin` to pay a donation. check below examples for more info.
+
+#### `--org`
+a number represents foundation index in the list.
+
+#### `--merchant`
+merchant ID to pay to. `--amount` and `--pin` needed.
+
+#### `--tips`
+this is optional amount paid as tip.
+
+#### `--reset-pin`
+you must know the old `--pin` to reset to a `--new` one.
+
+#### `--new`
+new pin number for wallet.
+
 #### `--signout` or `--logout`
 session logout and clean up local session & cookies files.
 
 ## Examples
 
 1) Authentication:
+
 `./EtCa.sh --wallet 01123456789 --auth`
+
 2) Verify recieved OTP:
+
 `./EtCa.sh --wallet 01123456789 --auth --otp 123456`
+
 3) Send money to another wallet:
+
 `./EtCa.sh --wallet 01123456789 --sendto 01123456788 --amount 500 --pin 654321`
+
 4) Check balance:
+
 `./EtCa.sh --wallet 01123456789 --balance --pin 654321`
+
 5) Create virtual credit card:
+
 `./EtCa.sh --wallet 01123456789 --vcc --amount 500 --pin 654321`
+
 6) List transactions history:
+
 `./EtCa.sh --wallet 01123456789 --transactions --pin 654321`
+
 to prettify XML output use any XML parser like `tidy`:
+
 `./EtCa.sh --wallet 01123456789 --transactions --pin 654321 | tidy -xml -i -q`
+
+7) Make a donation, to list foundations use:
+
+
+`./EtCa.sh --wallet 01123456789 --donation`
+
+`Foundations names & ID's`
+
+`     1  Magdy Ya’acoub-Child Operation=9156`
+
+`     2  Magdy Ya’acoub-Medical Equipment=9157`
+
+`     3  Magdi Yacoub Heart Foundation - General Donation=957`
+
+`     4  Magdy Ya’acoub-New Hospital Construction=9155`
+
+`     5  Ahl Masr Foundation=9899`
+
+`     6  Support Day Labor - Food Bank=923`
+
+`     7  Saq Odheya Balady - Food Bank=925`
+
+`     8  Egyptian Food Bank - General Donation=921`
+
+`     9  Food bank - Zakat Al Fetr=927`
+
+`    10  Baheya Foundation=9995`
+
+`    11  Orman Association=990`
+
+`    12  Egyptian Cure Bank=951`
+
+`    13  Saq Mostawrad - Food Bank=966`
+
+`    14  Mersal Foundation=9200`
+
+`    15  Egyptian Clothing Bank=961`
+
+`    16  Bayt Al Zakat - Sadakat=977`
+    
+    
+Choose the index of one of the above items
+
+`#Make a donation to as example Orman Association`
+
+`./EtCa.sh --wallet 01123456789 --donation --org 11 --amount 500`
+
+8) Pay to merchant:
+
+`./EtCa.sh --wallet 01123456789 --merchant 1234567890 --amount 500 --pin 123456`
+  
+  Pay tips
+  
+`./EtCa.sh --wallet 01123456789 --merchant 1234567890 --amount 500 --tips 50 --pin 123456`
+`
 
 #Notes
  1) Some `curl` headers are encoded, to decode it use `base64` & `base32` and just `echo`.
