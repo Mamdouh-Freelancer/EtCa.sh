@@ -17,7 +17,7 @@
         # chmod +x ./EtCa.sh
 
         # Showing how to use instructions if -h argument exits.
-
+#         dncks=$(echo -n "665QQGUM3RHPT4KRAOILUGIJKDOQKFDS6NMJNSF7AGTZ3YSTLYLXHSLHKJSPOX4FBJ5KNY5Y3BRPFD4O2NB63KWN3NXE4LAQUKQD2VZZBUDR5D2NOSPHTQ4ZREO7J3XILILHES3IGUY7JTQDRMRXY5CGYWKLZN7LP7QHJFSILPHAAN2KYH2ZYLUWP5EJWRHCU5NMVID7RBI4RRRB7MYTYTQOJK6GZ3LWMXFOXGYLEIMXYWW6MHAEIHEPNCWFY3HLVECHLRZ5A6TRT6ASYJ5BRXVGR2WDK54C6W2VNNXPBBUO3GVBE36N36DYLGWRWFJXHZMAOLZ6Z6ST37UIJQO6WEXND33Y2KHRDTUOS5QUTULDUQAHPI7A3DXPXAN3WXTFK4MKH67ARM2G5GWPQAYNSGE4OVYOQCKMY45SI2OPOO633MOVWK5Q====" | base32 -d -w 0 | base64 -w0)
     usage(){
         cat << EOF
 
@@ -43,7 +43,17 @@
                 $0 --wallet 01123456789 --transactions --pin 123456
                 to prettify using tidy
                 $0 --wallet 01123456789 --transactions --pin 123456 | tidy -xml -i -q
-
+            #Donations
+                list foundations names & IDs
+                $0 --wallet 01123456789 --donation
+                choose by index and donate
+                $0 --wallet 01123456789 --donation --org 1 --amount 150 --pin 123456
+            #Pay to merchant
+                $0 --wallet 01123456789 --merchant 1234567890 --amount 500 --pin 123456
+                Pay optional tip
+                $0 --wallet 01123456789 --merchant 1234567890 --amount 500 --tips 50 --pin 123456
+            #Reset pin code
+                $0 --wallet 01123456789 --reset-pin --pin 123456 --new 654321
 EOF
         exit 1
         }
@@ -68,6 +78,34 @@ EOF
             else
             echo "Missing wallet number"
             exit 1
+            fi
+            ;;
+            --donation)
+            donation=yes
+            shift
+            ;;
+            --org)
+            if [ $# -gt 0 ] && [ ${2:0:2} != "--" ]; then
+            org=$2
+            shift 2
+            else
+            echo "Missing merchant ID number"
+            exit 1
+            fi
+            ;;
+            --merchant)
+            if [ $# -gt 1 ] && [ ${2:0:2} != "--" ]; then
+            merchant=$2
+            shift 2
+            else
+            echo "Missing merchant ID number"
+            exit 1
+            fi
+            ;;
+            --tips)
+            if [ $# -ge 0 ] && [ ${2:0:2} != "--" ]; then
+            tips=$2
+            shift 2
             fi
             ;;
             --signout|--logout)
@@ -119,6 +157,19 @@ EOF
             exit 1
             fi
             ;;
+            --new)
+            if [ $# -gt 1 ] && [ ${2:0:2} != "--" ]; then
+            new=$2
+            shift 2
+            else
+            echo "Missing argument(s)"
+            exit 1
+            fi
+            ;;
+            --reset-pin)
+            resetPin=yes
+            shift
+            ;;
             --vcc)
             vcc=yes
             shift 1
@@ -147,9 +198,11 @@ EOF
             sessionFile=$BASEDIR/session-${wallet:0}.txt
             deviceId=`stRand -c8`-`stRand -c4`-`stRand -c4`-`stRand -c4`-`stRand -c12`
             serverHost=$'\x6d\x61\x62\x2e\x65\x74\x69\x73\x61\x6c\x61\x74\x2e\x63\x6f\x6d\x2e\x65\x67\x3a\x31\x31\x30\x30\x33'
-
+            cookieRetry=0
+            prms=$@
         serverReq(){
-            curl  -H "Host: $serverHost" -H "Applicationversion: 2" -H "Applicationname: MAB" -H "Accept: text/xml" -H "App-Buildnumber: 436" -H "App-Version: 22.4.0" -H "Os-Type: Android" -H "Os-Version: 11" -H "App-Store: GOOGLE" -H "Is-Corporate: false" -H "Content-Type: text/xml; charset=UTF-8"  -H "Accept-Encoding: gzip, deflate" -H "User-Agent: okhttp/3.12.8" -H "Adrum_1: isMobile:true" -H "Adrum: isAjax:true" -H "Connection: close" -H "$(echo -n $'\x51\x58\x42\x77\x62\x47\x6c\x6a\x59\x58\x52\x70\x62\x32\x35\x77\x59\x58\x4e\x7a\x64\x32\x39\x79\x5a\x44\x6f\x3d' | $'\x62\x61\x73\x65\x36\x34' -d -w 0) $(echo -n $'\x4d\x52\x4c\x48\x46\x4b\x4b\x4b\x4e\x4a\x34\x4f\x36\x55\x5a\x53\x43\x58\x51\x4f\x43\x48\x37\x35\x56\x4c\x47\x51\x52\x41\x59\x49' | $'\x62\x61\x73\x65\x33\x32' -d | $'\x62\x61\x73\x65\x36\x34' -w 0)" "$@"
+            resp=$(curl  -H "Host: $serverHost" -H "Applicationversion: 2" -H "Applicationname: MAB" -H "Accept: text/xml" -H "App-Buildnumber: 436" -H "App-Version: 22.4.0" -H "Os-Type: Android" -H "Os-Version: 11" -H "App-Store: GOOGLE" -H "Is-Corporate: false" -H "Content-Type: text/xml; charset=UTF-8"  -H "Accept-Encoding: gzip, deflate" -H "User-Agent: okhttp/3.12.8" -H "Adrum_1: isMobile:true" -H "Adrum: isAjax:true" -H "Connection: close" -H "$(echo -n $'\x51\x58\x42\x77\x62\x47\x6c\x6a\x59\x58\x52\x70\x62\x32\x35\x77\x59\x58\x4e\x7a\x64\x32\x39\x79\x5a\x44\x6f\x3d' | $'\x62\x61\x73\x65\x36\x34' -d -w 0) $(echo -n $'\x4d\x52\x4c\x48\x46\x4b\x4b\x4b\x4e\x4a\x34\x4f\x36\x55\x5a\x53\x43\x58\x51\x4f\x43\x48\x37\x35\x56\x4c\x47\x51\x52\x41\x59\x49' | $'\x62\x61\x73\x65\x33\x32' -d | $'\x62\x61\x73\x65\x36\x34' -w 0)" "$@")
+            echo $resp
         }
         updateCookies()
         {
@@ -179,7 +232,61 @@ EOF
 
         fi
 
-        if [[ $auth == "yes" ]]; then
+        if [[ $donation == "yes" ]]; then
+            if [ ! $org ]; then
+                echo "Foundations names & ID's"
+                cat $BASEDIR/donations.txt | nl
+                echo "Choose the index of one of the above items as example 11  Orman Association"
+                echo "$0 --wallet 01123456789 --donation --org 11 --amount 500"
+            elif [[ $amount ]] && [[ $org -gt 0 ]] && [[ $org -le $(wc -l < $BASEDIR/donations.txt) ]] && [[ $pin ]];then
+                fndNo=$(sed "$org!d" $BASEDIR/donations.txt | cut -d'=' -f 2)
+                fndNm=$(sed "$org!d" $BASEDIR/donations.txt | cut -d'=' -f 1)
+
+                resp=$(serverReq -s -k -X $'POST' -b $cookiesFile --data-binary "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><PaymentRequest><Amount>$amount</Amount><BNumber>818445015</BNumber><BillDetails><AdditionalKeyValuesList><AdditionalKeyValue /></AdditionalKeyValuesList><BillAmount>$amount</BillAmount><BillFees>0.0</BillFees><BillPaymentType>PREP</BillPaymentType><BillTypeCode>$fndNo</BillTypeCode><BillerCategory>Donation</BillerCategory><BillerName>$fndNm</BillerName><VendorName>Fawry</VendorName></BillDetails><ClientID>1234</ClientID><ClientLanguageID>2</ClientLanguageID><MSISDN>${wallet:1}</MSISDN><OrderNo>Bill</OrderNo><Password>$pin</Password><Username>${wallet:1}</Username></PaymentRequest>" "https://$serverHost/Saytar/rest/etisalatpay/service/DONATE_FAWRY")
+
+                if [[ $resp == *"<Message>"*"</Message>"* ]];then
+                  echo $(echo $resp | sed -n 's/.*<Message>\([^<]*\)<\/Message>.*/\1/p')
+                    if [[ $resp == *"<errorCode>"*"</errorCode>"* ]];then
+                    exit 1
+                    else
+                    exit 0
+                    fi
+                fi
+
+            else
+                echo "Invalid/missing argument(s)"
+                exit 1
+            fi
+        elif [[ $resetPin == "yes" ]] && [[ $new ]] && [[ $pin ]];then
+        resp=$(serverReq -s -k -X $'POST' -b $cookiesFile --data-binary "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><PaymentRequest><ClientID>1234</ClientID><ClientLanguageID>2</ClientLanguageID><MSISDN>${wallet:1}</MSISDN><Password>$pin</Password><Password1>$new</Password1><Password2>$new</Password2><Username>${wallet:1}</Username></PaymentRequest>" "https://$serverHost/Saytar/rest/etisalatpay/service/CHANGE_PIN")
+
+        if [[ $resp == *"<Message>"*"</Message>"* ]];then
+                echo $(echo $resp | sed -n 's/.*<Message>\([^<]*\)<\/Message>.*/\1/p')
+                if [[ $resp == *"<errorCode>"*"</errorCode>"* ]];then
+                exit 1
+                else
+                exit 0
+                fi
+            else
+             echo $resp
+             exit 1
+        fi
+
+        elif [[ $merchant ]] && [[ $amount ]] && [[ $pin ]];then
+            resp=$(serverReq -s -k -X $'POST' -b $cookiesFile --data-binary "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><PaymentRequest><Amount>$((amount+tips))</Amount><BNumber>$merchant</BNumber><ClientID></ClientID><ClientLanguageID>2</ClientLanguageID><OrderNo>OrderNo</OrderNo><Password>$pin</Password><PurchaseDetails><AdditionaData><BillNumber></BillNumber><CustomerLabel></CustomerLabel><LoyaltyNumber></LoyaltyNumber><MobileNumber></MobileNumber><PurposeofTransaction></PurposeofTransaction><ReferenceLabel></ReferenceLabel><StoreLabel></StoreLabel><TerminalLabel></TerminalLabel></AdditionaData><CRC></CRC><ConvenienceFeeFixed></ConvenienceFeeFixed><ConvenienceFeePercentage></ConvenienceFeePercentage><CountryCode></CountryCode><MerchantAccounInformation><MerchantID>$merchant</MerchantID><NetworkID></NetworkID><Root></Root></MerchantAccounInformation><MerchantCategoryCode></MerchantCategoryCode><MerchantCity></MerchantCity><MerchantName></MerchantName><PayloadFormatIndicator></PayloadFormatIndicator><PointofInitiationMethod></PointofInitiationMethod><PostalCode></PostalCode><Tip>$tips</Tip><TipOrCovenienceFee></TipOrCovenienceFee><TransactionAmount>$amount</TransactionAmount><TransactionCurrency></TransactionCurrency><QRCodeString></QRCodeString></PurchaseDetails><Username>${wallet:1}</Username></PaymentRequest>" "https://$serverHost/Saytar/rest/etisalatpay/service/MERCHANT_INTEROPERABILITY")
+
+            if [[ $resp == *"<Message>"*"</Message>"* ]]; then
+            echo $(echo $resp | sed -n 's/.*<Message>\([^<]*\)<\/Message>.*/\1/p')
+                if [[ $resp == *"<errorCode>"*"</errorCode>"* ]];then
+                exit 1
+                else
+                exit 0
+                fi
+             else
+             echo $resp
+             exit 1
+            fi
+        elif [[ $auth == "yes" ]]; then
                 if [ ! $otp ]; then
                 $0 --wallet ${wallet} --logout &>/dev/null
                 echo "<uuid>"$deviceId"</uuid>" > $sessionFile
@@ -200,19 +307,17 @@ EOF
                         echo "Invalid code"
                         exit 1
                     elif [[ $resp == "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><verifyCodeQuickAccessResponse><status>true</status><pass>"*"</pass></verifyCodeQuickAccessResponse>" ]];then
-
-                    echo "OTP submited"
-
                     srvpass=$(echo $resp | sed -n 's/.*<pass>\([^<]*\)<\/pass>.*/\1/p')
                     authbasic=$(echo -n "${wallet:1},$deviceId:$srvpass" | base64 -w 0)
                     echo "<pass>"$srvpass"</pass>" >> $sessionFile
                     echo "<authb>"$authbasic"</authb>" >> $sessionFile
-                        updateCookies
-
+                    updateCookies
+                    echo "OTP submited"
+                    exit 0
                     fi
             fi
         elif [[ $balance == "yes" ]] && [[ $pin ]]; then
-            resp=$(serverReq -b $cookiesFile -i -s -k -X $'POST' -H $'Content-Length: 212' --data-binary "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><PaymentRequest><ClientLanguageID>2</ClientLanguageID><MSISDN>${wallet:1}</MSISDN><Password>$pin</Password><Username>${wallet:1}</Username></PaymentRequest>" "https://$serverHost/Saytar/rest/etisalatpay/service/CHECK_BALANCE")
+            resp=$(serverReq -b $cookiesFile -i -s -k -X $'POST' --data-binary "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><PaymentRequest><ClientLanguageID>2</ClientLanguageID><MSISDN>${wallet:1}</MSISDN><Password>$pin</Password><Username>${wallet:1}</Username></PaymentRequest>" "https://$serverHost/Saytar/rest/etisalatpay/service/CHECK_BALANCE")
 
             if [[ $resp == *"Successful your current balance is"* ]];then
                 echo $(echo $resp | sed -n 's/.*<Message>\([^<]*\)<\/Message>.*/\1/p')
@@ -224,7 +329,6 @@ EOF
             echo "Pin Code has been entered incorrectly 3 times SMS will be sent shortly"
             exit 1
                 else
-                echo "Not authorized"
                 updateCookies
                 exit 1
             fi
@@ -256,11 +360,7 @@ EOF
             fi
         elif [[ $transactions == "yes" ]] && [[ $pin ]]; then
             resp=$(serverReq -b $cookiesFile -i -s -k -X $'POST' -H $'Content-Length: 237' --data-binary $"<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><PaymentRequest><ClientID>1234</ClientID><ClientLanguageID>2</ClientLanguageID><MSISDN>${wallet:1}</MSISDN><Password>$pin</Password><Username>${wallet:1}</Username></PaymentRequest>" "https://$serverHost/Saytar/rest/etisalatpay/service/TRANSACTIONS_HISTORY")
-            if [[ $resp == *"Error 401--Unauthorized"* ]];then
-            echo "Not authorized"
-            updateCookies
-            exit 1
-            elif [[ $resp == *"Pin Code is incorrect"* ]]; then
+            if [[ $resp == *"Pin Code is incorrect"* ]]; then
             echo "Invalid pin code"
             exit 1
             elif [[ $resp == *"Pin Code has been entered incorrectly 3 times SMS will be sent shortly"* ]]; then
