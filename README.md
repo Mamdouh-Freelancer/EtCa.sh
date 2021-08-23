@@ -1,10 +1,18 @@
 # EtCa.sh
-EtCa.sh is the first Etisalat Cash wrapper for Linux, written in bash script.
+EtCa.sh is the first Etisalat Cash wrapper for Linux, written in bash script. a command line utility to manage your Etisalat cash wallet.
+
+### Supported Features:
+- [x] Send money to any wallet in Egypt.
+- [x] Check wallet balance.
+- [x] Generate virtual credit card VCC numbers.
+- [x] List transactions history.
+- [x] Donate to 16 charities in Egypt.
+- [x] Pay to merchant.
+- [x] Reset pin code.  
+- [x] Recharge to others (prepaid balance transfer).
+
 
 ![carbon3](https://user-images.githubusercontent.com/23267401/130317864-79c77d16-40db-41cd-8b72-f73c48599c34.png)
-
-## Etisalat Cash service was designed for consumer, So don't use it as payment gateway (for your customers as example), it isn't made for that purpose.
-
 
                #**********#
                # Consider #
@@ -15,20 +23,6 @@ EtCa.sh is the first Etisalat Cash wrapper for Linux, written in bash script.
                 * script please refer to service provider for their TOS.                  *
                 * 3. contact author by mail mamdouh.saeed.eg@gmail.com                    *
                 ***************************************************************************
-
-### Supported Features:
-- [x] Send money to any wallet in Egypt.
-- [x] Check wallet balance.
-- [x] Generate virtual credit card VCC numbers.
-- [x] List transactions history
-- [x] Donate to 16 charities in Egypt.
-- [x] Pay to merchant.
-- [x] Reset pin code.  
-- [x] Recharge to others (prepaid balance transfer).
-
-### Known Issues
-* Most important server responses are handled well but not all.
-* `updateCookies` function needs some improvements to check cookies expiration and reupdate it.
 
 ### How to 
 
@@ -176,7 +170,13 @@ Choose the index of one of the above items
   Pay tips
   
 `./EtCa.sh --wallet 01123456789 --merchant 1234567890 --amount 500 --tips 50 --pin 123456`
-`
+
+## Etisalat Cash service was designed for consumer, So don't use it as payment gateway (for your customers as example), it isn't made for that purpose.
+                
+                
+### Known Issues
+* Most important server responses are handled well but not all.
+* `updateCookies` function needs some improvements to check cookies expiration and reupdate it.
 
 #Notes
  1) Some `curl` headers are encoded, to decode it use `base64` & `base32` and just `echo`.
