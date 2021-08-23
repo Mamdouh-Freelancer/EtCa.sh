@@ -53,7 +53,7 @@
             #Reset pin code
                 $0 --wallet 01123456789 --reset-pin --pin 123456 --new 654321
             #Recharge to others
-                $0 --wallet 01123456789 --rechargeto 01123456788 --amount --pin 123456
+                $0 --wallet 01123456789 --rechargeto 01123456788 --amount 50 --pin 123456
 EOF
         exit 1
         }
