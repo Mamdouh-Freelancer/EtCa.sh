@@ -24,7 +24,7 @@ EtCa.sh is an Etisalat Cash wrapper example for Linux, written in bash script & 
 - [x] Donate.
 - [x] Pay to merchant.
 - [x] Reset pin code.  
-
+- [x] Recharge to others (prepaid balance transfer).
 
 ### Known Issues
 * Most important server responses are handled well but not all.
@@ -46,7 +46,10 @@ Set read/write/execute permissions to script
 wallet number in local format e.g. 01123456789.
 
 #### `--sendto`
-destination wallet number that will receive money from you, formated as 01123456789.
+destination wallet number that will receive money from you, e.g. 01123456789.
+
+#### `--rechargeto`
+destination dial number on prepaid rateplan which will receive balance, e.g. 01123456789.
 
 #### `--auth`           
 to authenticate for first time login or if cookies expired (consider `updateCookies` function). this is a must to request and verify OTP.
