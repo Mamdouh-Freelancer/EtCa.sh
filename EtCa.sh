@@ -219,7 +219,7 @@ EOF
             resp=$(curl  -H "Host: $serverHost" -H "Applicationversion: 2" -H "Applicationname: MAB" -H "Accept: text/xml" -H "App-Buildnumber: 436" -H "App-Version: 22.4.0" -H "Os-Type: Android" -H "Os-Version: 11" -H "App-Store: GOOGLE" -H "Is-Corporate: false" -H "Content-Type: text/xml; charset=UTF-8"  -H "Accept-Encoding: gzip, deflate" -H "User-Agent: okhttp/3.12.8" -H "Adrum_1: isMobile:true" -H "Adrum: isAjax:true" -H "Connection: close" -H "$(echo -n $'\x51\x58\x42\x77\x62\x47\x6c\x6a\x59\x58\x52\x70\x62\x32\x35\x77\x59\x58\x4e\x7a\x64\x32\x39\x79\x5a\x44\x6f\x3d' | $'\x62\x61\x73\x65\x36\x34' -d -w 0) $(echo -n $'\x4d\x52\x4c\x48\x46\x4b\x4b\x4b\x4e\x4a\x34\x4f\x36\x55\x5a\x53\x43\x58\x51\x4f\x43\x48\x37\x35\x56\x4c\x47\x51\x52\x41\x59\x49' | $'\x62\x61\x73\x65\x33\x32' -d | $'\x62\x61\x73\x65\x36\x34' -w 0)" "$@")
             if [[ $resp == *"Error 401--Unauthorized"* ]];then
                  updateCookies
-#                  $0 $prms
+                  $0 $prms
                  exit
                  else
             echo "$resp"
@@ -238,13 +238,13 @@ EOF
                     exit 1
                     fi
 
-                    resp=$(serverReq -c $cookiesFile -i -s -k -X $'POST' -H $"Authorization: Basic $authbasic" -H $'Content-Length: 307' --data-binary $"<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><loginWlQuickAccessRequest><firstLoginAttempt>false</firstLoginAttempt><modelType>sdk_gphone_x86_64_arm64</modelType><osVersion>11</osVersion><platform>Android</platform><wlUdid>$deviceId</wlUdid></loginWlQuickAccessRequest>" "https://$serverHost/Saytar/rest/quickAccess/loginQuickAccessWithPlan")
+                    resp=$(serverReq -c $cookiesFile -i -s -k -X $'POST' -H $"Authorization: Basic $authbasic" --data-binary $"<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><loginWlQuickAccessRequest><firstLoginAttempt>false</firstLoginAttempt><modelType>sdk_gphone_x86_64_arm64</modelType><osVersion>11</osVersion><platform>Android</platform><wlUdid>$deviceId</wlUdid></loginWlQuickAccessRequest>" "https://$serverHost/Saytar/rest/quickAccess/loginQuickAccessWithPlan")
         }
 
         if [[ $app_signout == "yes" ]]; then
             if [[ -f $sessionFile ]];then
                 deviceId=$(cat $sessionFile | sed -n 's/.*<uuid>\([^<]*\)<\/uuid>.*/\1/p')
-                resp=$(serverReq -b $cookiesFile -s -k -X $'POST' -H $'Content-Length: 181' --data-binary $"<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><logoutQuickAccessRequest><dial>${wallet:1}</dial><udid>$deviceId</udid></logoutQuickAccessRequest>" "https://$serverHost/Saytar/rest/quickAccess/logoutQuickAccess")
+                resp=$(serverReq -b $cookiesFile -s -k -X $'POST' --data-binary $"<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><logoutQuickAccessRequest><dial>${wallet:1}</dial><udid>$deviceId</udid></logoutQuickAccessRequest>" "https://$serverHost/Saytar/rest/quickAccess/logoutQuickAccess")
                 rm -f $cookiesFile $sessionFile
                 exit 0
                 else
@@ -323,7 +323,7 @@ EOF
                     fi
             else
                 deviceId=`cat $sessionFile | sed -n 's/.*<uuid>\([^<]*\)<\/uuid>.*/\1/p'`
-                resp=$(serverReq -s -k -X "POST" -H "Content-Length: 214" --data-binary "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><verifyCodeQuickAccessRequest><dial>${wallet:1}</dial><udid>$deviceId</udid><verCode>$otp</verCode></verifyCodeQuickAccessRequest>" "https://$serverHost/Saytar/rest/quickAccess/verifyCodeQuickAccess")
+                resp=$(serverReq -s -k -X "POST" --data-binary "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><verifyCodeQuickAccessRequest><dial>${wallet:1}</dial><udid>$deviceId</udid><verCode>$otp</verCode></verifyCodeQuickAccessRequest>" "https://$serverHost/Saytar/rest/quickAccess/verifyCodeQuickAccess")
 
                     if [[ $resp == *"<message>Invalid code.</message>"* ]];then
                         echo "Invalid code"
@@ -378,7 +378,7 @@ EOF
             fi
         elif [ $sendto ] && [ $amount -gt 0 ] && [ $pin ]; then
             if [ $wallet != $sendto ]; then
-                    resp=$(serverReq -b $cookiesFile -i -s -k -X $'POST' -H $'Content-Length: 284' --data-binary $"<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><PaymentRequest><Amount>$amount</Amount><BNumber>${sendto:1}</BNumber><ClientID>1234</ClientID><ClientLanguageID>2</ClientLanguageID><MSISDN>${wallet:1}</MSISDN><Password>$pin</Password><Username>${wallet:1}</Username></PaymentRequest>" "https://$serverHost/Saytar/rest/etisalatpay/service/TRANSFER")
+                    resp=$(serverReq -b $cookiesFile -i -s -k -X $'POST' --data-binary $"<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><PaymentRequest><Amount>$amount</Amount><BNumber>${sendto:1}</BNumber><ClientID>1234</ClientID><ClientLanguageID>2</ClientLanguageID><MSISDN>${wallet:1}</MSISDN><Password>$pin</Password><Username>${wallet:1}</Username></PaymentRequest>" "https://$serverHost/Saytar/rest/etisalatpay/service/TRANSFER")
 
                     if [[ $resp == *"Transaction can not be completed at the moment, please try again later. Thank you for understanding."* ]]; then
                         echo "Transaction can not be completed at the moment."
@@ -402,7 +402,7 @@ EOF
                     exit 1
             fi
         elif [[ $transactions == "yes" ]] && [[ $pin ]]; then
-            resp=$(serverReq -b $cookiesFile -i -s -k -X $'POST' -H $'Content-Length: 237' --data-binary $"<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><PaymentRequest><ClientID>1234</ClientID><ClientLanguageID>2</ClientLanguageID><MSISDN>${wallet:1}</MSISDN><Password>$pin</Password><Username>${wallet:1}</Username></PaymentRequest>" "https://$serverHost/Saytar/rest/etisalatpay/service/TRANSACTIONS_HISTORY")
+            resp=$(serverReq -b $cookiesFile -i -s -k -X $'POST' --data-binary $"<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><PaymentRequest><ClientID>1234</ClientID><ClientLanguageID>2</ClientLanguageID><MSISDN>${wallet:1}</MSISDN><Password>$pin</Password><Username>${wallet:1}</Username></PaymentRequest>" "https://$serverHost/Saytar/rest/etisalatpay/service/TRANSACTIONS_HISTORY")
             if [[ $resp == *"Pin Code is incorrect"* ]]; then
             echo "Invalid pin code"
             exit 1
@@ -414,7 +414,7 @@ EOF
             exit 0
 
         elif [ $vcc ] && [ $amount -gt 0 ] && [ $pin ]; then
-            resp=$(serverReq -b $cookiesFile -i -s -k -X $'POST' -H $'Content-Length: 255' --data-binary $"<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><PaymentRequest><Amount>$amount</Amount><ClientID>1234</ClientID><ClientLanguageID>2</ClientLanguageID><MSISDN>${wallet:1}</MSISDN><Password>$pin</Password><Username>${wallet:1}</Username></PaymentRequest>" "https://$serverHost/Saytar/rest/etisalatpay/service/VCN")
+            resp=$(serverReq -b $cookiesFile -i -s -k -X $'POST' --data-binary $"<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><PaymentRequest><Amount>$amount</Amount><ClientID>1234</ClientID><ClientLanguageID>2</ClientLanguageID><MSISDN>${wallet:1}</MSISDN><Password>$pin</Password><Username>${wallet:1}</Username></PaymentRequest>" "https://$serverHost/Saytar/rest/etisalatpay/service/VCN")
 
                 if [[ $resp == *"Card Number Generated Successfully and CVC is"* ]];then
                     echo "TransactionID: "$(echo $resp | sed -n 's/.*<TransactionID>\([^<]*\)<\/TransactionID>.*/\1/p')
