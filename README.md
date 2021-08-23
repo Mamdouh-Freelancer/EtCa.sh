@@ -180,7 +180,7 @@ Choose the index of one of the above items
 
 #Notes
  1) Some `curl` headers are encoded, to decode it use `base64` & `base32` and just `echo`.
- 2) This repository is useful for automation tasks for your own wallet and as mentioned before don't use it as payment gateway for your customers (as example) coz it doesn't made for this purpose.
+ 2) This script is useful for automation tasks for your own wallet and as mentioned before don't use it as payment gateway for your customers (as example) coz it doesn't made for this purpose.
 
 
 
