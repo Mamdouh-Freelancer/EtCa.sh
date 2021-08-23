@@ -54,6 +54,8 @@
                 $0 --wallet 01123456789 --merchant 1234567890 --amount 500 --tips 50 --pin 123456
             #Reset pin code
                 $0 --wallet 01123456789 --reset-pin --pin 123456 --new 654321
+            #Recharge to others
+                $0 --wallet 01123456789 --rechargeto 01123456788 --amount --pin 123456
 EOF
         exit 1
         }
@@ -63,7 +65,7 @@ EOF
         fi
 
         unknown_args=()
-
+        prms=$@
         while [ $# -gt 0 ]; do
             case "$1" in
             --wallet)
@@ -139,6 +141,20 @@ EOF
             exit 1
             fi
             ;;
+            --rechargeto)
+            if [ $# -gt 1 ] && [ ${2:0:2} != "--" ]; then
+            if [[ ${#2} -eq 11 ]] && [[ $2  =~ ^01 ]]; then
+            rechargeto=$2
+            shift 2
+            else
+            echo "$2 is invalid reciever number, please use a valid number e.g. 01123456789"
+            exit 1
+            fi
+            else
+            echo "Missing argument(s)"
+            exit 1
+            fi
+            ;;
             --amount)
             if [ $# -gt 1 ] && [ ${2:0:2} != "--" ] && [ $2 -gt 0 ]; then
             amount=$2
@@ -199,15 +215,21 @@ EOF
             deviceId=`stRand -c8`-`stRand -c4`-`stRand -c4`-`stRand -c4`-`stRand -c12`
             serverHost=$'\x6d\x61\x62\x2e\x65\x74\x69\x73\x61\x6c\x61\x74\x2e\x63\x6f\x6d\x2e\x65\x67\x3a\x31\x31\x30\x30\x33'
             cookieRetry=0
-            prms=$@
         serverReq(){
             resp=$(curl  -H "Host: $serverHost" -H "Applicationversion: 2" -H "Applicationname: MAB" -H "Accept: text/xml" -H "App-Buildnumber: 436" -H "App-Version: 22.4.0" -H "Os-Type: Android" -H "Os-Version: 11" -H "App-Store: GOOGLE" -H "Is-Corporate: false" -H "Content-Type: text/xml; charset=UTF-8"  -H "Accept-Encoding: gzip, deflate" -H "User-Agent: okhttp/3.12.8" -H "Adrum_1: isMobile:true" -H "Adrum: isAjax:true" -H "Connection: close" -H "$(echo -n $'\x51\x58\x42\x77\x62\x47\x6c\x6a\x59\x58\x52\x70\x62\x32\x35\x77\x59\x58\x4e\x7a\x64\x32\x39\x79\x5a\x44\x6f\x3d' | $'\x62\x61\x73\x65\x36\x34' -d -w 0) $(echo -n $'\x4d\x52\x4c\x48\x46\x4b\x4b\x4b\x4e\x4a\x34\x4f\x36\x55\x5a\x53\x43\x58\x51\x4f\x43\x48\x37\x35\x56\x4c\x47\x51\x52\x41\x59\x49' | $'\x62\x61\x73\x65\x33\x32' -d | $'\x62\x61\x73\x65\x36\x34' -w 0)" "$@")
+            if [[ $resp == *"Error 401--Unauthorized"* ]];then
+                 updateCookies
+#                  $0 $prms
+                 exit
+                 else
             echo "$resp"
+            fi
         }
         updateCookies()
         {
-                    sessionFileStr=$(cat $sessionFile)
-                    if [[ -f $sessionFile ]] && [[ $(echo $sessionFileStr | sed -n 's/.*<authb>\([^<]*\)<\/authb>.*/\1/p') ]];then
+
+                    if [[ -f $sessionFile ]] && [[ $(cat $sessionFile | sed -n 's/.*<authb>\([^<]*\)<\/authb>.*/\1/p') ]];then
+                        sessionFileStr=$(cat $sessionFile)
                         srvpass=$(echo $sessionFileStr | sed -n 's/.*<pass>\([^<]*\)<\/pass>.*/\1/p')
                         deviceId=$(echo $sessionFileStr | sed -n 's/.*<uuid>\([^<]*\)<\/uuid>.*/\1/p')
                         authbasic=$(echo -n "${wallet:1},$deviceId:$srvpass" | base64 -w 0)
@@ -332,7 +354,28 @@ EOF
                 updateCookies
                 exit 1
             fi
+        elif [ $rechargeto ] && [ $amount -gt 0 ] && [ $pin ]; then
+            if [ $wallet != $rechargeto ]; then
 
+                    resp=$(serverReq -b $cookiesFile -s -k -X "POST" --data-binary "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><PaymentRequest><Amount>$amount</Amount><BNumber>$rechargeto</BNumber><ClientID>1234</ClientID><ClientLanguageID>2</ClientLanguageID><MSISDN>${wallet:1}</MSISDN><Password>$pin</Password><Username>${wallet:1}</Username></PaymentRequest>" "https://$serverHost/Saytar/rest/etisalatpay/service/RECHARGE")
+
+
+                    if [[ $resp == *"<Message>"*"</Message>"* ]]; then
+                        echo $(echo $resp | sed -n 's/.*<Message>\([^<]*\)<\/Message>.*/\1/p')
+                        if [[ $resp == *"<errorCode>"*"</errorCode>"* ]];then
+                        exit 1
+                        else
+                        exit 0
+                        fi
+                    else
+                    echo $resp
+                    exit 1
+                    fi
+
+                else
+                    echo "Sender and reciever are same"
+                    exit 1
+            fi
         elif [ $sendto ] && [ $amount -gt 0 ] && [ $pin ]; then
             if [ $wallet != $sendto ]; then
                     resp=$(serverReq -b $cookiesFile -i -s -k -X $'POST' -H $'Content-Length: 284' --data-binary $"<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><PaymentRequest><Amount>$amount</Amount><BNumber>${sendto:1}</BNumber><ClientID>1234</ClientID><ClientLanguageID>2</ClientLanguageID><MSISDN>${wallet:1}</MSISDN><Password>$pin</Password><Username>${wallet:1}</Username></PaymentRequest>" "https://$serverHost/Saytar/rest/etisalatpay/service/TRANSFER")
