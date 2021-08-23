@@ -55,16 +55,16 @@ One-Time-Password included in SMS that you recieved for verification.
 wallet pin code should be 6 digits. contact service provider for more info. pin code is a must to take any actions/inquiries.
 
 #### `--balance`        
-check wallet balance, `--pin` code needed.
+check wallet balance, `--pin` code required.
 
 #### `--vcc`            
-create VCC virtual credit card. card details will be sent in SMS. `--pin`, `--amount` are needed.
+create VCC virtual credit card. card details will be sent in SMS. `--pin`, `--amount` are required.
 
 #### `--amount`         
 specify amount when using `--sendto` and `--vcc`.
 
 #### `--transactions`   
-list transactions history in XML format. `--pin` code needed.
+list transactions history in XML format. `--pin` code required.
 
 #### `--donation`
 list all available foundations with their ID's from donations.txt, attach `--org`, `--amount` and `--pin` to pay a donation. check below examples for more info.
@@ -73,7 +73,7 @@ list all available foundations with their ID's from donations.txt, attach `--org
 a number represents foundation index in the list.
 
 #### `--merchant`
-merchant ID to pay to. `--amount` and `--pin` needed.
+merchant ID to pay to. `--amount` and `--pin` required.
 
 #### `--tips`
 this is optional amount paid as tip.
