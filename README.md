@@ -21,7 +21,7 @@ EtCa.sh is the first Etisalat Cash wrapper for Linux, written in bash script.
 - [x] Check wallet balance.
 - [x] Create virtual credit card VCC.
 - [x] List transactions history
-- [x] Donate.
+- [x] Donate to 16 charities in Egypt.
 - [x] Pay to merchant.
 - [x] Reset pin code.  
 - [x] Recharge to others (prepaid balance transfer).
