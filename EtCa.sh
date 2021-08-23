@@ -1,4 +1,4 @@
-        #!/bin/bash
+#!/bin/bash
         #        EtCa.sh is unofficial Etisalat Cash wrapper for developers
         #      written in bash script available for Linux.
         #
@@ -202,7 +202,7 @@ EOF
             prms=$@
         serverReq(){
             resp=$(curl  -H "Host: $serverHost" -H "Applicationversion: 2" -H "Applicationname: MAB" -H "Accept: text/xml" -H "App-Buildnumber: 436" -H "App-Version: 22.4.0" -H "Os-Type: Android" -H "Os-Version: 11" -H "App-Store: GOOGLE" -H "Is-Corporate: false" -H "Content-Type: text/xml; charset=UTF-8"  -H "Accept-Encoding: gzip, deflate" -H "User-Agent: okhttp/3.12.8" -H "Adrum_1: isMobile:true" -H "Adrum: isAjax:true" -H "Connection: close" -H "$(echo -n $'\x51\x58\x42\x77\x62\x47\x6c\x6a\x59\x58\x52\x70\x62\x32\x35\x77\x59\x58\x4e\x7a\x64\x32\x39\x79\x5a\x44\x6f\x3d' | $'\x62\x61\x73\x65\x36\x34' -d -w 0) $(echo -n $'\x4d\x52\x4c\x48\x46\x4b\x4b\x4b\x4e\x4a\x34\x4f\x36\x55\x5a\x53\x43\x58\x51\x4f\x43\x48\x37\x35\x56\x4c\x47\x51\x52\x41\x59\x49' | $'\x62\x61\x73\x65\x33\x32' -d | $'\x62\x61\x73\x65\x36\x34' -w 0)" "$@")
-            echo $resp
+            echo "$resp"
         }
         updateCookies()
         {
