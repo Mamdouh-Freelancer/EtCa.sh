@@ -428,7 +428,17 @@ EOF
                 elif [[ $resp == *"Pin Code has been entered incorrectly 3 times SMS will be sent shortly"* ]]; then
                     echo "Pin Code has been entered incorrectly 3 times SMS will be sent shortly"
                     exit 1
+                elif [[ $resp == *"<Message>"*"</Message>"* ]]; then
+                    echo $(echo $resp | sed -n 's/.*<Message>\([^<]*\)<\/Message>.*/\1/p')
+                    if [[ $resp == *"<errorCode>"*"</errorCode>"* ]];then
+                    exit 1
+                    else
+                    exit 0
                 fi
+             else
+             echo $resp
+             exit 1
+            fi
         else
             echo "Invalid/missing argument(s)"
         fi
