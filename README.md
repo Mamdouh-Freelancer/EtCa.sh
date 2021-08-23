@@ -1,5 +1,5 @@
 # EtCa.sh
-EtCa.sh is an Etisalat Cash wrapper example for Linux, written in bash script & uses `curl`.
+EtCa.sh is the first Etisalat Cash wrapper for Linux, written in bash script.
 
 ![carbon3](https://user-images.githubusercontent.com/23267401/130317864-79c77d16-40db-41cd-8b72-f73c48599c34.png)
 
