@@ -24,14 +24,11 @@ EtCa.sh is the first Etisalat Cash wrapper for Linux, written in bash script. a 
                 * 3. contact author by mail mamdouh.saeed.eg@gmail.com                    *
                 ***************************************************************************
 
-### How to 
+### Installation 
 
 Download zip file manually or clone using git:
 
-`git clone https://github.com/Mamdouh-Freelancer/EtCa.sh.git`
-
-Set read/write/execute permissions to script
-`chmod 777 ./EtCa.sh`
+`git clone https://github.com/Mamdouh-Freelancer/EtCa.sh.git && cd EtCa.sh && chmod 777 ./EtCa.sh`
  
 
 ### [OPTIONS]
