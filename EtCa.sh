@@ -13,8 +13,8 @@
         #        ************************************************************************
 
 
-        # add execute premission to this script
-        # chmod +x ./EtCa.sh
+        # set rwx premission to this script
+        # chmod 777 ./EtCa.sh
 
     usage(){
         cat << EOF
