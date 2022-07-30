@@ -206,7 +206,8 @@ EOF
         stRand(){
         head /dev/urandom | tr -dc a-z0-9 | head $@
         }
-
+            dmodel="sdk_gphone_x86_64_arm64"
+            dmodel="etcash_for_linux"
             BASEDIR=$(dirname $(realpath "$0"))
             cookiesFile=$BASEDIR/cookies-${wallet:0}.txt
             sessionFile=$BASEDIR/session-${wallet:0}.txt
@@ -235,7 +236,7 @@ EOF
                     exit 1
                     fi
 
-                    resp=$(serverReq -c $cookiesFile -i -s -k -X $'POST' -H $"Authorization: Basic $authbasic" --data-binary $"<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><loginWlQuickAccessRequest><firstLoginAttempt>false</firstLoginAttempt><modelType>sdk_gphone_x86_64_arm64</modelType><osVersion>11</osVersion><platform>Android</platform><wlUdid>$deviceId</wlUdid></loginWlQuickAccessRequest>" "https://$serverHost/Saytar/rest/quickAccess/loginQuickAccessWithPlan")
+                    resp=$(serverReq -c $cookiesFile -i -s -k -X $'POST' -H $"Authorization: Basic $authbasic" --data-binary $"<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><loginWlQuickAccessRequest><firstLoginAttempt>false</firstLoginAttempt><modelType>$dmodel</modelType><osVersion>11</osVersion><platform>Android</platform><wlUdid>$deviceId</wlUdid></loginWlQuickAccessRequest>" "https://$serverHost/Saytar/rest/quickAccess/loginQuickAccessWithPlan")
         }
 
         if [[ $app_signout == "yes" ]]; then
@@ -256,7 +257,7 @@ EOF
                 echo "Foundations names & ID's"
                 cat $BASEDIR/donations.txt | nl
                 echo "Choose the index of one of the above items as example 11  Orman Association"
-                echo "$0 --wallet 01123456789 --donation --org 11 --amount 500"
+                echo "$0 --wallet 01123456789 --donation --org 11 --amount 500 --pin 123456"
             elif [[ $amount ]] && [[ $org -gt 0 ]] && [[ $org -le $(wc -l < $BASEDIR/donations.txt) ]] && [[ $pin ]];then
                 fndNo=$(sed "$org!d" $BASEDIR/donations.txt | cut -d'=' -f 2)
                 fndNm=$(sed "$org!d" $BASEDIR/donations.txt | cut -d'=' -f 1)
@@ -311,21 +312,22 @@ EOF
                 echo "<uuid>"$deviceId"</uuid>" > $sessionFile
                 resp=$(serverReq -s -k -X $'GET' "https://$serverHost/Saytar/rest/quickAccess/sendVerCodeQuickAccessV2?sendVerCodeQuickAccessRequest=%3CsendVerCodeQuickAccessRequest%3E%3Cudid%3E$deviceId%3C%2Fudid%3E%3Cdial%3E${wallet:1}%3C%2Fdial%3E%3C%2FsendVerCodeQuickAccessRequest%3E")
 
-                    if [[ $resp == "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><sendVerCodeQuickAccessResponseV2><status>true</status><dial>${wallet:1}</dial><pattern>(^|\s)([0-9]+)($|\s)</pattern><smsVerificationSender>My Etisalat</smsVerificationSender><verCode></verCode></sendVerCodeQuickAccessResponseV2>" ]];then
+                    if [[ $resp == "<?xml version=\"1.0\" encoding=\"UTF-8\"?><sendVerCodeQuickAccessResponseV2><status>true</status><dial>${wallet:1}</dial><pattern>(^|\s)([0-9]+)($|\s)</pattern><smsVerificationSender>My Etisalat</smsVerificationSender><verCode></verCode>"*"</sendVerCodeQuickAccessResponseV2>" ]];then
                     echo "OTP sent"
                     exit 0
                     else
                         echo "Authentication failed"
+                        echo $resp
                         exit 1
                     fi
             else
                 deviceId=`cat $sessionFile | sed -n 's/.*<uuid>\([^<]*\)<\/uuid>.*/\1/p'`
                 resp=$(serverReq -s -k -X "POST" --data-binary "<?xml version='1.0' encoding='UTF-8' standalone='yes' ?><verifyCodeQuickAccessRequest><dial>${wallet:1}</dial><udid>$deviceId</udid><verCode>$otp</verCode></verifyCodeQuickAccessRequest>" "https://$serverHost/Saytar/rest/quickAccess/verifyCodeQuickAccess")
-
+                    #echo $resp;
                     if [[ $resp == *"<message>Invalid code.</message>"* ]];then
                         echo "Invalid code"
                         exit 1
-                    elif [[ $resp == "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><verifyCodeQuickAccessResponse><status>true</status><pass>"*"</pass></verifyCodeQuickAccessResponse>" ]];then
+                    elif [[ $resp == "<?xml version=\"1.0\" encoding=\"UTF-8\"?><verifyCodeQuickAccessResponse><status>true</status><pass>"*"</pass></verifyCodeQuickAccessResponse>" ]];then
                     srvpass=$(echo $resp | sed -n 's/.*<pass>\([^<]*\)<\/pass>.*/\1/p')
                     authbasic=$(echo -n "${wallet:1},$deviceId:$srvpass" | base64 -w 0)
                     echo "<pass>"$srvpass"</pass>" >> $sessionFile
